@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 
-START_YEAR = 2024
+START_YEAR = 2023
 END_YEAR = 2024
 
 if not os.path.exists('Data'):
@@ -161,38 +161,86 @@ for index, row in schedules.iterrows():
     print(f"Round result downlaoded")
     print("--------------------------------------------------")
 
-race_laps = pd.concat(race_laps)
-race_laps.to_csv("Data/race_laps.csv", index=False)
+try:
+    race_laps = pd.concat(race_laps)
+    race_laps.to_csv("Data/race_laps.csv", index=False)
+except:
+    print("No race laps found")
 
-race_results = pd.concat(race_results)
-race_results.to_csv("Data/race_results.csv", index=False)
+try:
+    race_results = pd.concat(race_results)
+    race_results.to_csv("Data/race_results.csv", index=False)
+except:
+    print("No race results found")
 
-qualifying_laps = pd.concat(qualifying_laps)
-qualifying_laps.to_csv("Data/qualifying_laps.csv", index=False)
+try:
+    qualifying_laps = pd.concat(qualifying_laps)
+    qualifying_laps.to_csv("Data/qualifying_laps.csv", index=False)
+except:
+    print("No qualifying laps found")
 
-qualifying_results = pd.concat(qualifying_results)
-qualifying_results.to_csv("Data/qualifying_results.csv", index=False)
+try:
+    qualifying_results = pd.concat(qualifying_results)
+    qualifying_results.to_csv("Data/qualifying_results.csv", index=False)
+except:
+    print("No qualifying results found")
+    
+try:
+    sprint_shootout_laps = pd.concat(sprint_shootout_laps)
+    sprint_shootout_laps.to_csv("Data/sprint_shootout_laps.csv", index=False)
+except:
+    print("No sprint shootout laps found")
 
-sprint_laps = pd.concat(sprint_laps)
-sprint_laps.to_csv("Data/sprint_laps.csv", index=False)
+try:
+    sprint_shootout_results = pd.concat(sprint_shootout_results)
+    sprint_shootout_results.to_csv("Data/sprint_shootout_results.csv", index=False)
+except:
+    print("No sprint shootout results found")
 
-sprint_results = pd.concat(sprint_results)
-sprint_results.to_csv("Data/sprint_results.csv", index=False)
+try:
+    sprint_laps = pd.concat(sprint_laps)
+    sprint_laps.to_csv("Data/sprint_laps.csv", index=False)
+except:
+    print("No sprint laps found")
 
-practic1_laps = pd.concat(practic1_laps)
-practic1_laps.to_csv("Data/practic1_laps.csv", index=False)
+try:
+    sprint_results = pd.concat(sprint_results)
+    sprint_results.to_csv("Data/sprint_results.csv", index=False)
+except:
+    print("No sprint results found")
 
-practic1_results = pd.concat(practic1_results)
-practic1_results.to_csv("Data/practic1_results.csv", index=False)
+try:
+    practic1_laps = pd.concat(practic1_laps)
+    practic1_laps.to_csv("Data/practic1_laps.csv", index=False)
+except:
+    print("No FP1 laps found")
 
-practic2_laps = pd.concat(practic2_laps)
-practic2_laps.to_csv("Data/practic2_laps.csv", index=False)
+try:
+    practic1_results = pd.concat(practic1_results)
+    practic1_results.to_csv("Data/practic1_results.csv", index=False)
+except:
+    print("No FP1 results found")
 
-practic2_results = pd.concat(practic2_results)
-practic2_results.to_csv("Data/practic2_results.csv", index=False)
+try:
+    practic2_laps = pd.concat(practic2_laps)
+    practic2_laps.to_csv("Data/practic2_laps.csv", index=False)
+except:
+    print("No FP2 laps found")
 
-practic3_laps = pd.concat(practic3_laps)
-practic3_laps.to_csv("Data/practic3_laps.csv", index=False)
+try:
+    practic2_results = pd.concat(practic2_results)
+    practic2_results.to_csv("Data/practic2_results.csv", index=False)
+except:
+    print("No FP2 results found")
 
-practic3_results = pd.concat(practic3_results)
-practic3_results.to_csv("Data/practic3_results.csv", index=False)
+try:
+    practic3_laps = pd.concat(practic3_laps)
+    practic3_laps.to_csv("Data/practic3_laps.csv", index=False)
+except:
+    print("No FP3 laps found")
+    
+try:
+    practic3_results = pd.concat(practic3_results)
+    practic3_results.to_csv("Data/practic3_results.csv", index=False)
+except:
+    print("No FP3 results found")
