@@ -2,9 +2,15 @@ import fastf1
 import pandas as pd
 import os
 from datetime import datetime, timedelta
+import argparse
 
-START_YEAR = 2023
-END_YEAR = 2024
+parser = argparse.ArgumentParser(description='Fetch Formula 1 data.')
+parser.add_argument('--start-year', type=int, default=2024, help='Start year for fetching data')
+parser.add_argument('--end-year', type=int, default=2024, help='End year for fetching data')
+args = parser.parse_args()
+
+START_YEAR = args.start_year
+END_YEAR = args.end_year
 
 if not os.path.exists('Data'):
     os.makedirs('Data')
