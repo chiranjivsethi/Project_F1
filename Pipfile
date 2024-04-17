@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 fastf1 = "*"
-sqlalchemy = "*"
 psycopg2 = "*"
 
 [dev-packages]
