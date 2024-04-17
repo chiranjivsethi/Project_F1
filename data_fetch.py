@@ -3,9 +3,6 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 import argparse
-from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import json
 
 parser = argparse.ArgumentParser(description="Fetch Formula 1 data.")
@@ -17,9 +14,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--storage",
-    choices=["local", "postgres"],
+    choices=["local", "database"],
     default="local",
-    help="Storage option for saving data (local or postgres)",
+    help="Storage option for saving data (local or database)",
 )
 
 args = parser.parse_args()
@@ -38,7 +35,11 @@ with open("config.json") as config_file:
 db_config = config["database"]
 
 # Initialize SQLAlchemy engine if PostgreSQL storage is chosen
-if storage_option == "postgres":
+if storage_option == "database":
+    from sqlalchemy import create_engine, Column, Integer, String, Float
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker
+
     engine = create_engine(
         f"{db_config['drivername']}://{db_config['username']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database_name']}"
     )
@@ -107,54 +108,57 @@ for year in range(START_YEAR, END_YEAR + 1):
     schedule = fastf1.get_event_schedule(year)
 
     # Add EventID (primary key)
-    schedule["EventID"] = range(event_id, len(schedule) + event_id)
-    event_id = len(schedule) + event_id
+    try:
+        schedule["EventID"] = range(event_id, len(schedule) + event_id)
+        event_id = len(schedule) + event_id
+    except:
+        print(f"Cannot fetech schedule for {year}")
+        continue
 
-    save_data_function(schedule, "Data/schedule.csv")
-    schedule_df = pd.DataFrame()
+        save_data_function(schedule, "Data/schedule.csv")
 
     for index, row in schedule.iterrows():
         print(f"Fetching data for round {row['RoundNumber']} in {year} year")
 
         # Fetching session data
-        try:
-            sessions = ["FP1", "FP2", "FP3", "Q", "R", "S", "SS"]
-            for session_type in sessions:
+        sessions = ["FP1", "FP2", "FP3", "Q", "R", "S", "SS"]
+        for session_type in sessions:
+            try:
                 session = fastf1.get_session(year, row["RoundNumber"], session_type)
                 session.load()
                 results = session.results
                 laps = session.laps
+            except:
+                print(f"Session: {session_type}, does not exist")
+                continue
 
-                # Add EventID (reference key)  to session data
-                results["EventID"] = row["EventID"]
-                laps["EventID"] = row["EventID"]
+            # Add EventID (reference key)  to session data
+            results["EventID"] = row["EventID"]
+            laps["EventID"] = row["EventID"]
 
-                # Add SessionType as column
-                results["SessionType"] = session_type
-                laps["SessionType"] = session_type
+            # Add SessionType as column
+            results["SessionType"] = session_type
+            laps["SessionType"] = session_type
 
-                # Append session data
-                if session_type.startswith("FP"):
-                    save_data_function(results, "Data/practice_results.csv")
-                    save_data_function(laps, "Data/practice_laps.csv")
+            # Append session data
+            if session_type.startswith("FP"):
+                save_data_function(results, "Data/practice_results.csv")
+                save_data_function(laps, "Data/practice_laps.csv")
 
-                elif session_type == "Q":
-                    save_data_function(results, "Data/qualifying_results.csv")
-                    save_data_function(laps, "Data/qualifying_laps.csv")
+            elif session_type == "Q":
+                save_data_function(results, "Data/qualifying_results.csv")
+                save_data_function(laps, "Data/qualifying_laps.csv")
 
-                elif session_type == "R":
-                    save_data_function(results, "Data/race_results.csv")
-                    save_data_function(laps, "Data/race_laps.csv")
+            elif session_type == "R":
+                save_data_function(results, "Data/race_results.csv")
+                save_data_function(laps, "Data/race_laps.csv")
 
-                elif session_type == "S":
-                    save_data_function(results, "Data/sprint_results.csv")
-                    save_data_function(laps, "Data/sprint_laps.csv")
+            elif session_type == "S":
+                save_data_function(results, "Data/sprint_results.csv")
+                save_data_function(laps, "Data/sprint_laps.csv")
 
-                elif session_type == "SS":
-                    save_data_function(results, "Data/sprint_shootout_results.csv")
-                    save_data_function(laps, "Data/sprint_shootout_laps.csv")
-
-        except Exception as e:
-            print(f"Error fetching data for round {row['RoundNumber']} in {year}: {e}")
+            elif session_type == "SS":
+                save_data_function(results, "Data/sprint_shootout_results.csv")
+                save_data_function(laps, "Data/sprint_shootout_laps.csv")
 
 print("Data fetching and saving completed")
