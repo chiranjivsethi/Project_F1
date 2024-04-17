@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS laps (
     IsAccurate BOOLEAN,
     EventID INT,
     SessionType VARCHAR(100),
-    PRIMARY KEY (EventID, SessionType, LapNumber),
+    PRIMARY KEY (EventID, SessionType, Team, Driver, DriverNumber, LapNumber),
     FOREIGN KEY (EventID) REFERENCES schedule(EventID)
 );
 
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS results (
     HeadshotUrl VARCHAR(255),
     CountryCode VARCHAR(3),
     Position INT,
-    ClassifiedPosition INT,
+    ClassifiedPosition VARCHAR(2),
     GridPosition INT,
     Q1 INTERVAL,
     Q2 INTERVAL,

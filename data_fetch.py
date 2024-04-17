@@ -8,7 +8,7 @@ import json
 
 parser = argparse.ArgumentParser(description="Fetch Formula 1 data.")
 parser.add_argument(
-    "--start-year", type=int, default=2024, help="Start year for fetching data"
+    "--start-year", type=int, default=2020, help="Start year for fetching data"
 )
 parser.add_argument(
     "--end-year", type=int, default=2024, help="End year for fetching data"
@@ -72,8 +72,9 @@ def upload_data_to_table(dataframe, table_name, conn=None):
     cursor = None
     
     try:
-        # Convert DataFrame to a list of tuples, replacing NaT with None
-        data = [tuple(None if pd.isnull(value) else value for value in row) for row in dataframe.to_numpy()]
+        # Convert DataFrame to a list of tuples, replacing NaT, NaN and empty strings with None
+        data = [tuple(None if pd.isnull(value) or value == '' else value for value in row) for row in dataframe.to_numpy()]
+
         
         # Create a cursor
         cursor = conn.cursor()
@@ -158,6 +159,3 @@ for year in range(START_YEAR, END_YEAR + 1):
             elif storage_option == "database":
                 upload_data_to_table(results, "results", conn)
                 upload_data_to_table(laps, "laps", conn)
-                
-if conn:
-    conn.close()
