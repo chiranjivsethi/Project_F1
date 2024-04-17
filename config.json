@@ -1,0 +1,10 @@
+{
+  "database": {
+    "drivername": "postgresql",
+    "username": "your_username",
+    "password": "your_password",
+    "host": "localhost",
+    "port": "5432",
+    "database_name": "your_database_name"
+  }
+}
