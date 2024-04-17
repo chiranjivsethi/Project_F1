@@ -1,5 +1,4 @@
 import fastf1
-import pandas as pd
 import os
 from datetime import datetime, timedelta
 import argparse
@@ -7,10 +6,10 @@ import json
 
 parser = argparse.ArgumentParser(description="Fetch Formula 1 data.")
 parser.add_argument(
-    "--start-year", type=int, default=2024, help="Start year for fetching data"
+    "--start-year", type=int, default=2023, help="Start year for fetching data"
 )
 parser.add_argument(
-    "--end-year", type=int, default=2024, help="End year for fetching data"
+    "--end-year", type=int, default=2023, help="End year for fetching data"
 )
 parser.add_argument(
     "--storage",
@@ -105,23 +104,27 @@ elif storage_option == "postgres":
 
 for year in range(START_YEAR, END_YEAR + 1):
     print(f"Fetching schedule for {year} year")
-    schedule = fastf1.get_event_schedule(year)
-
-    # Add EventID (primary key)
     try:
-        schedule["EventID"] = range(event_id, len(schedule) + event_id)
-        event_id = len(schedule) + event_id
+        schedule = fastf1.get_event_schedule(year)
     except:
         print(f"Cannot fetech schedule for {year}")
         continue
 
-        save_data_function(schedule, "Data/schedule.csv")
+    # Add EventID (primary key)
+    schedule["EventID"] = range(event_id, len(schedule) + event_id)
+    event_id = len(schedule) + event_id
+    
+    save_data_function(schedule, "Data/schedule.csv")
 
     for index, row in schedule.iterrows():
         print(f"Fetching data for round {row['RoundNumber']} in {year} year")
 
+        if (datetime.now() - timedelta(days=5)) < row["EventDate"]:
+            print(f"Data not avalable for {row['RoundNumber']}")
+            continue
+
         # Fetching session data
-        sessions = ["FP1", "FP2", "FP3", "Q", "R", "S", "SS"]
+        sessions = ["FP1", "FP2", "FP3", "S", "SS", "Q", "R"]
         for session_type in sessions:
             try:
                 session = fastf1.get_session(year, row["RoundNumber"], session_type)
@@ -145,14 +148,6 @@ for year in range(START_YEAR, END_YEAR + 1):
                 save_data_function(results, "Data/practice_results.csv")
                 save_data_function(laps, "Data/practice_laps.csv")
 
-            elif session_type == "Q":
-                save_data_function(results, "Data/qualifying_results.csv")
-                save_data_function(laps, "Data/qualifying_laps.csv")
-
-            elif session_type == "R":
-                save_data_function(results, "Data/race_results.csv")
-                save_data_function(laps, "Data/race_laps.csv")
-
             elif session_type == "S":
                 save_data_function(results, "Data/sprint_results.csv")
                 save_data_function(laps, "Data/sprint_laps.csv")
@@ -160,5 +155,13 @@ for year in range(START_YEAR, END_YEAR + 1):
             elif session_type == "SS":
                 save_data_function(results, "Data/sprint_shootout_results.csv")
                 save_data_function(laps, "Data/sprint_shootout_laps.csv")
+
+            elif session_type == "Q":
+                save_data_function(results, "Data/qualifying_results.csv")
+                save_data_function(laps, "Data/qualifying_laps.csv")
+
+            elif session_type == "R":
+                save_data_function(results, "Data/race_results.csv")
+                save_data_function(laps, "Data/race_laps.csv")
 
 print("Data fetching and saving completed")
