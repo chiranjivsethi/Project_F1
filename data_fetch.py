@@ -1,4 +1,6 @@
 import fastf1
+import numpy as np
+import pandas as pd
 import os
 from datetime import datetime, timedelta
 import argparse
@@ -14,7 +16,7 @@ parser.add_argument(
 parser.add_argument(
     "--storage",
     choices=["local", "database"],
-    default="local",
+    default="database",
     help="Storage option for saving data (local or database)",
 )
 
@@ -26,12 +28,29 @@ END_YEAR = args.end_year
 # Check the value of the 'storage' argument
 storage_option = args.storage
 
-# Read database configuration from config.json
-with open("config.json") as config_file:
-    config = json.load(config_file)
+if storage_option == 'database':
+    # Read database configuration from config.json
+    with open("config.json") as config_file:
+        config = json.load(config_file)
 
-# Extract database configuration
-db_config = config["database"]
+    # Extract database configuration
+    db_config = config["database"]
+
+    # Establish a connection to the database
+    try:
+        import psycopg2
+
+        conn = psycopg2.connect(
+            dbname=db_config["database_name"],
+            user=db_config["username"],
+            password=db_config["password"],
+            host=db_config["host"],
+            port=db_config["port"]
+        )
+        print("Connected to the database")
+        
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
 
 # Define function to save data to CSV
 def save_data_to_csv(data, filename):
@@ -42,19 +61,50 @@ def save_data_to_csv(data, filename):
         print(f"Data saved to {filename}")
     except Exception as e:
         print(f"Error saving data to {filename}: {e}")
+        
+def upload_data_to_table(dataframe, table_name, conn=None):
+    
+    if conn:
+        print("Conneection provided")
+    else:
+        print("No Conneection provided")
+    
+    cursor = None
+    
+    try:
+        # Convert DataFrame to a list of tuples, replacing NaT with None
+        data = [tuple(None if pd.isnull(value) else value for value in row) for row in dataframe.to_numpy()]
+        
+        # Create a cursor
+        cursor = conn.cursor()
+        
+        # Construct the SQL query for inserting data into the table
+        columns = ", ".join(dataframe.columns)
+        placeholders = ", ".join(["%s"] * len(dataframe.columns))
+        insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+        
+        # Execute the insert query
+        cursor.executemany(insert_query, data)
+        
+        # Commit the transaction
+        conn.commit()
+        print(f"Data uploaded to '{table_name}' table successfully")
+        
+    except Exception as e:
+        print(f"Error uploading data to '{table_name}' table: {e}")
+        conn.rollback()
+        
+    finally:
+        # Close cursor and connection
+        if cursor:
+            cursor.close()
 
 # Create directory for saving data if it doesn't exist
 if not os.path.exists("Data"):
     os.makedirs("Data")
 
 event_id = 1
-
-# Depending on storage option, choose the saving function
-if storage_option == "local":
-    save_data_function = save_data_to_csv
-elif storage_option == "database":
-    pass
-
+    
 for year in range(START_YEAR, END_YEAR + 1):
     print(f"Fetching schedule for {year} year")
     try:
@@ -67,7 +117,11 @@ for year in range(START_YEAR, END_YEAR + 1):
     schedule["EventID"] = range(event_id, len(schedule) + event_id)
     event_id = len(schedule) + event_id
     
-    save_data_function(schedule, "Data/schedule.csv")
+    if storage_option == "local":
+        save_data_to_csv(schedule, "Data/schedule.csv")
+    
+    elif storage_option == "database":
+        upload_data_to_table(schedule, "schedule", conn)
 
     for index, row in schedule.iterrows():
         print(f"Fetching data for round {row['RoundNumber']} in {year} year")
@@ -95,9 +149,15 @@ for year in range(START_YEAR, END_YEAR + 1):
             # Add SessionType as column
             results["SessionType"] = session_type
             laps["SessionType"] = session_type
-
+            
             # Append session data
-            save_data_function(results, "Data/results.csv")
-            save_data_function(laps, "Data/laps.csv")
-
-print("Data fetching and saving completed")
+            if storage_option == "local":
+                save_data_to_csv(results, "Data/results.csv")
+                save_data_to_csv(laps, "Data/laps.csv")
+            
+            elif storage_option == "database":
+                upload_data_to_table(results, "results", conn)
+                upload_data_to_table(laps, "laps", conn)
+                
+if conn:
+    conn.close()

@@ -1,6 +1,5 @@
 {
   "database": {
-    "drivername": "postgresql",
     "username": "jane",
     "password": "doe",
     "host": "localhost",
