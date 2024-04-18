@@ -1,10 +1,11 @@
 import asyncio
 import aiofiles
-import aiopg
+#import aiopg
+import asyncpg
 import json
 import os
 import fastf1
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
@@ -13,7 +14,7 @@ async def setup_db_connection():
     with open("config.json") as config_file:
         config = json.load(config_file)
     db_config = config["database"]
-    return await aiopg.connect(
+    return await asyncpg.connect(
         dbname=db_config["database_name"],
         user=db_config["username"],
         password=db_config["password"],

@@ -1,7 +1,7 @@
 import fastf1
 import pandas as pd
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import argparse
 import json
 
@@ -127,8 +127,8 @@ for year in range(START_YEAR, END_YEAR + 1):
     for index, row in schedule.iterrows():
         print(f"Fetching data for round {row['RoundNumber']} in {year} year")
 
-        if (datetime.now() - timedelta(days=5)) < row["EventDate"]:
-            print(f"Data not avalable for {row['RoundNumber']}")
+        if (datetime.now(timezone.utc) + timedelta(days=5)) < row["EventDate"]:
+            print(f"Data not available yet for {row['RoundNumber']}")
             continue
 
         # Fetching session data

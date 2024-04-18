@@ -8,6 +8,7 @@ fastf1 = "*"
 psycopg2 = "*"
 aiofiles = "*"
 aiopg = "*"
+asyncpg = "*"
 
 [dev-packages]
 
