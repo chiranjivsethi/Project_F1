@@ -1,5 +1,6 @@
 -- Create the schedule table
 CREATE TABLE IF NOT EXISTS schedule (
+    EventID INT PRIMARY KEY,
     RoundNumber INT,
     Country VARCHAR(100),
     Location VARCHAR(100),
@@ -8,22 +9,16 @@ CREATE TABLE IF NOT EXISTS schedule (
     EventName VARCHAR(100),
     EventFormat VARCHAR(100),
     Session1 VARCHAR(100),
-    Session1Date TIMESTAMP,
     Session1DateUtc TIMESTAMP,
     Session2 VARCHAR(100),
-    Session2Date TIMESTAMP,
     Session2DateUtc TIMESTAMP,
     Session3 VARCHAR(100),
-    Session3Date TIMESTAMP,
     Session3DateUtc TIMESTAMP,
     Session4 VARCHAR(100),
-    Session4Date TIMESTAMP,
     Session4DateUtc TIMESTAMP,
     Session5 VARCHAR(100),
-    Session5Date TIMESTAMP,
     Session5DateUtc TIMESTAMP,
-    F1ApiSupport BOOLEAN,
-    EventID INT PRIMARY KEY
+    F1ApiSupport BOOLEAN
 );
 
 -- Create the laps table

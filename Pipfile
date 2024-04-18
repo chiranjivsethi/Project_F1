@@ -9,8 +9,10 @@ psycopg2 = "*"
 aiofiles = "*"
 aiopg = "*"
 asyncpg = "*"
+loguru = "*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.12"
