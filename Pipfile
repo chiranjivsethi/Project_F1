@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 fastf1 = "*"
 psycopg2 = "*"
+aiofiles = "*"
+aiopg = "*"
 
 [dev-packages]
 

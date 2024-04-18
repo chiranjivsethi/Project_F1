@@ -1,5 +1,4 @@
 import fastf1
-import numpy as np
 import pandas as pd
 import os
 from datetime import datetime, timedelta
@@ -75,7 +74,6 @@ def upload_data_to_table(dataframe, table_name, conn=None):
         # Convert DataFrame to a list of tuples, replacing NaT, NaN and empty strings with None
         data = [tuple(None if pd.isnull(value) or value == '' else value for value in row) for row in dataframe.to_numpy()]
 
-        
         # Create a cursor
         cursor = conn.cursor()
         
