@@ -1,5 +1,5 @@
-# Use the official PostgreSQL image from Docker Hub
-FROM postgres:latest
+# Use the official PostgreSQL image from Docker Hub with a specific version
+FROM postgres:14.2
 
 # Set environment variables for PostgreSQL
 ENV POSTGRES_USER=jane

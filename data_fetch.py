@@ -8,7 +8,7 @@ import json
 
 parser = argparse.ArgumentParser(description="Fetch Formula 1 data.")
 parser.add_argument(
-    "--start-year", type=int, default=2020, help="Start year for fetching data"
+    "--start-year", type=int, default=2024, help="Start year for fetching data"
 )
 parser.add_argument(
     "--end-year", type=int, default=2024, help="End year for fetching data"
@@ -103,6 +103,8 @@ def upload_data_to_table(dataframe, table_name, conn=None):
 # Create directory for saving data if it doesn't exist
 if not os.path.exists("Data"):
     os.makedirs("Data")
+    os.makedirs("Data/docker_volume")
+    os.makedirs("Data/local_storage_csv")
 
 event_id = 1
     
@@ -119,7 +121,7 @@ for year in range(START_YEAR, END_YEAR + 1):
     event_id = len(schedule) + event_id
     
     if storage_option == "local":
-        save_data_to_csv(schedule, "Data/schedule.csv")
+        save_data_to_csv(schedule, "Data/local_storage_csv/schedule.csv")
     
     elif storage_option == "database":
         upload_data_to_table(schedule, "schedule", conn)
@@ -153,8 +155,8 @@ for year in range(START_YEAR, END_YEAR + 1):
             
             # Append session data
             if storage_option == "local":
-                save_data_to_csv(results, "Data/results.csv")
-                save_data_to_csv(laps, "Data/laps.csv")
+                save_data_to_csv(results, "Data/local_storage_csv/results.csv")
+                save_data_to_csv(laps, "Data/local_storage_csv/laps.csv")
             
             elif storage_option == "database":
                 upload_data_to_table(results, "results", conn)

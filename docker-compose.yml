@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  db:
+    build: .
+    environment:
+      - POSTGRES_USER=jane
+      - POSTGRES_PASSWORD=doe
+      - POSTGRES_DB=f1
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: Data/docker_volume
+      o: bind
