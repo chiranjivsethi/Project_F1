@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS results (
     LastName VARCHAR(100),
     FullName VARCHAR(100),
     HeadshotUrl VARCHAR(255),
-    CountryCode VARCHAR(3),
+    CountryCode VARCHAR(10),
     Position INT,
     ClassifiedPosition VARCHAR(2),
     GridPosition INT,
