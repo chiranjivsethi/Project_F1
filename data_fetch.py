@@ -138,6 +138,8 @@ for year in range(START_YEAR, END_YEAR + 1):
             results = results.drop(
                 [
                     "BroadcastName",
+                    "Abbreviation",
+                    "TeamColor",
                     "DriverId",
                     "FirstName",
                     "LastName",

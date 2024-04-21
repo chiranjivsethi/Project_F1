@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS schedule (
 
 -- Create the laps table
 CREATE TABLE IF NOT EXISTS laps (
+    EventID INT,
+    SessionType VARCHAR(100),
     Time INTERVAL,
     Driver VARCHAR(100),
     DriverNumber INT,
@@ -34,9 +36,6 @@ CREATE TABLE IF NOT EXISTS laps (
     Sector1Time INTERVAL,
     Sector2Time INTERVAL,
     Sector3Time INTERVAL,
-    Sector1SessionTime INTERVAL,
-    Sector2SessionTime INTERVAL,
-    Sector3SessionTime INTERVAL,
     SpeedI1 FLOAT,
     SpeedI2 FLOAT,
     SpeedFL FLOAT,
@@ -54,26 +53,17 @@ CREATE TABLE IF NOT EXISTS laps (
     DeletedReason VARCHAR(100),
     FastF1Generated BOOLEAN,
     IsAccurate BOOLEAN,
-    EventID INT,
-    SessionType VARCHAR(100),
-    PRIMARY KEY (EventID, SessionType, Team, Driver, DriverNumber, LapNumber),
     FOREIGN KEY (EventID) REFERENCES schedule(EventID)
 );
 
 -- Create the results table
 CREATE TABLE IF NOT EXISTS results (
+    EventID INT,
+    SessionType VARCHAR(100),
     DriverNumber INT,
-    BroadcastName VARCHAR(100),
-    Abbreviation VARCHAR(100),
-    DriverId VARCHAR(100),
     TeamName VARCHAR(100),
-    TeamColor VARCHAR(100),
-    TeamId VARCHAR(100),
-    FirstName VARCHAR(100),
-    LastName VARCHAR(100),
     FullName VARCHAR(100),
-    HeadshotUrl VARCHAR(255),
-    CountryCode VARCHAR(10),
+    CountryCode VARCHAR(100),
     Position INT,
     ClassifiedPosition VARCHAR(2),
     GridPosition INT,
@@ -83,8 +73,21 @@ CREATE TABLE IF NOT EXISTS results (
     Time INTERVAL,
     Status VARCHAR(100),
     Points FLOAT,
-    EventID INT,
-    SessionType VARCHAR(100),
-    PRIMARY KEY (EventID, SessionType, DriverId),
     FOREIGN KEY (EventID) REFERENCES schedule(EventID)
+    FOREIGN KEY (FullName) REFERENCES drivers(FullName)
+    FOREIGN KEY (TeamName) REFERENCES schedule(TeamName)
+);
+
+-- Create the teams table
+CREATE TABLE IF NOT EXISTS teams (
+    TeamID INT PRIMARY KEY,
+    TeamName VARCHAR(100),
+    TeamColor VARCHAR(6),
+);
+
+-- Create the drivers table
+CREATE TABLE IF NOT EXISTS drivers (
+    DriverID INT PRIMARY KEY,
+    FullName VARCHAR(100),
+    Abbreviation VARCHAR(3),
 );
