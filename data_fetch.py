@@ -21,7 +21,7 @@ parser.add_argument(
 parser.add_argument(
     "--storage",
     choices=["local", "database"],
-    default="local",
+    default="locals",
     help="Storage option for saving data (local or database)",
 )
 
