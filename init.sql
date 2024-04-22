@@ -1,93 +1,91 @@
 -- Create the schedule table
 CREATE TABLE IF NOT EXISTS schedule (
-    EventID INT PRIMARY KEY,
+    EventID SERIAL PRIMARY KEY,
     RoundNumber INT,
     Country VARCHAR(100),
     Location VARCHAR(100),
-    OfficialEventName VARCHAR(100),
-    EventDate TIMESTAMP,
-    EventName VARCHAR(100),
+    OfficialEventName VARCHAR(200),
+    EventDate DATE,
+    EventName VARCHAR(200),
     EventFormat VARCHAR(100),
     Session1 VARCHAR(100),
-    Session1DateUtc TIMESTAMP,
+    Session1Date TIMESTAMP WITH TIME ZONE,
+    Session1DateUtc TIMESTAMP WITH TIME ZONE, -- New column for Session1Date UTC
     Session2 VARCHAR(100),
-    Session2DateUtc TIMESTAMP,
+    Session2Date TIMESTAMP WITH TIME ZONE,
+    Session2DateUtc TIMESTAMP WITH TIME ZONE, -- New column for Session2Date UTC
     Session3 VARCHAR(100),
-    Session3DateUtc TIMESTAMP,
+    Session3Date TIMESTAMP WITH TIME ZONE,
+    Session3DateUtc TIMESTAMP WITH TIME ZONE, -- New column for Session3Date UTC
     Session4 VARCHAR(100),
-    Session4DateUtc TIMESTAMP,
+    Session4Date TIMESTAMP WITH TIME ZONE,
+    Session4DateUtc TIMESTAMP WITH TIME ZONE, -- New column for Session4Date UTC
     Session5 VARCHAR(100),
-    Session5DateUtc TIMESTAMP,
+    Session5Date TIMESTAMP WITH TIME ZONE,
+    Session5DateUtc TIMESTAMP WITH TIME ZONE, -- New column for Session5Date UTC
     F1ApiSupport BOOLEAN
 );
 
 -- Create the laps table
 CREATE TABLE IF NOT EXISTS laps (
     EventID INT,
-    SessionType VARCHAR(100),
+    SessionType VARCHAR(10),
     Time INTERVAL,
-    Driver VARCHAR(100),
+    Driver VARCHAR(50),
     DriverNumber INT,
     LapTime INTERVAL,
-    LapNumber FLOAT,
+    LapNumber INT,
     Stint FLOAT,
     PitOutTime INTERVAL,
     PitInTime INTERVAL,
     Sector1Time INTERVAL,
     Sector2Time INTERVAL,
     Sector3Time INTERVAL,
+    Sector1SessionTime INTERVAL,
+    Sector2SessionTime INTERVAL,
+    Sector3SessionTime INTERVAL,
     SpeedI1 FLOAT,
     SpeedI2 FLOAT,
     SpeedFL FLOAT,
     SpeedST FLOAT,
     IsPersonalBest BOOLEAN,
-    Compound VARCHAR(100),
+    Compound VARCHAR(20),
     TyreLife FLOAT,
     FreshTyre BOOLEAN,
-    Team VARCHAR(100),
+    Team VARCHAR(50),
     LapStartTime INTERVAL,
-    LapStartDate TIMESTAMP,
+    LapStartDate TIMESTAMP WITHOUT TIME ZONE,
     TrackStatus INT,
     Position INT,
     Deleted BOOLEAN,
-    DeletedReason VARCHAR(100),
+    DeletedReason VARCHAR(50),
     FastF1Generated BOOLEAN,
-    IsAccurate BOOLEAN,
-    FOREIGN KEY (EventID) REFERENCES schedule(EventID)
+    IsAccurate BOOLEAN
 );
 
 -- Create the results table
 CREATE TABLE IF NOT EXISTS results (
     EventID INT,
-    SessionType VARCHAR(100),
+    SessionType VARCHAR(10),
     DriverNumber INT,
+    BroadcastName VARCHAR(50),
+    Abbreviation VARCHAR(10),
+    DriverId VARCHAR(50),
     TeamName VARCHAR(100),
+    TeamColor VARCHAR(10),
+    TeamId VARCHAR(50),
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
     FullName VARCHAR(100),
-    CountryCode VARCHAR(100),
+    HeadshotUrl VARCHAR(255),
+    CountryCode VARCHAR(10),
     Position INT,
-    ClassifiedPosition VARCHAR(2),
+    ClassifiedPosition VARCHAR(10),
     GridPosition INT,
     Q1 INTERVAL,
     Q2 INTERVAL,
     Q3 INTERVAL,
     Time INTERVAL,
-    Status VARCHAR(100),
-    Points FLOAT,
-    FOREIGN KEY (EventID) REFERENCES schedule(EventID)
-    FOREIGN KEY (FullName) REFERENCES drivers(FullName)
-    FOREIGN KEY (TeamName) REFERENCES schedule(TeamName)
-);
-
--- Create the teams table
-CREATE TABLE IF NOT EXISTS teams (
-    TeamID INT PRIMARY KEY,
-    TeamName VARCHAR(100),
-    TeamColor VARCHAR(6),
-);
-
--- Create the drivers table
-CREATE TABLE IF NOT EXISTS drivers (
-    DriverID INT PRIMARY KEY,
-    FullName VARCHAR(100),
-    Abbreviation VARCHAR(3),
+    Status VARCHAR(50),
+    Points FLOAT
 );

@@ -13,7 +13,7 @@ logger.info("Starting....")
 
 parser = argparse.ArgumentParser(description="Fetch Formula 1 data.")
 parser.add_argument(
-    "--start-year", type=int, default=2023, help="Start year for fetching data"
+    "--start-year", type=int, default=2018, help="Start year for fetching data"
 )
 parser.add_argument(
     "--end-year", type=int, default=2024, help="End year for fetching data"
@@ -21,7 +21,7 @@ parser.add_argument(
 parser.add_argument(
     "--storage",
     choices=["local", "database"],
-    default="locals",
+    default="database",
     help="Storage option for saving data (local or database)",
 )
 
@@ -36,6 +36,8 @@ storage_option = args.storage
 logger.info(f"Start Year: {START_YEAR}")
 logger.info(f"End Year: {END_YEAR}")
 logger.info(f"Storage Type: {storage_option}")
+
+conn = None
 
 if storage_option == "database":
     # Read database configuration from config.json
@@ -73,25 +75,13 @@ if not os.path.exists("Data/docker_volume"):
 
 if not os.path.exists("Data/local_storage_csv"):
     os.makedirs("Data/local_storage_csv")
-
-event_id = updating_event_id(storage_option)
-driver_id = updating_driver_id(storage_option)
-team_id = updating_team_id(storage_option)
+    
+event_id = updating_event_id(storage_option, conn)
 
 for year in range(START_YEAR, END_YEAR + 1):
     logger.info(f"Fetching schedule for {year} year")
     try:
         schedule = fastf1.get_event_schedule(year)
-        schedule = schedule.drop(
-            [
-                "Session1Date",
-                "Session2Date",
-                "Session3Date",
-                "Session4Date",
-                "Session5Date",
-            ],
-            axis=1,
-        )
     except:
         logger.error(f"Cannot fetech schedule for {year}")
         continue
@@ -100,6 +90,7 @@ for year in range(START_YEAR, END_YEAR + 1):
     schedule["EventID"] = range(event_id, len(schedule) + event_id)
     schedule.insert(0, "EventID", schedule.pop("EventID"))
     event_id = len(schedule) + event_id
+    logger.debug('Updated event_id: ' + str(event_id))
 
     if storage_option == "local":
         save_data_to_csv(schedule, "Data/local_storage_csv/schedule.csv")
@@ -125,37 +116,6 @@ for year in range(START_YEAR, END_YEAR + 1):
             except:
                 logger.error(f"Session: {session_type}, does not exist")
                 continue
-
-            # Getting drivers
-            drivers = results[["FullName", "Abbreviation"]].drop_duplicates("FullName")
-            driver_id = update_drivers(drivers, driver_id)
-
-            # Getting teams
-            teams = results[["TeamName", "TeamColor"]].drop_duplicates(["TeamName"])
-            team_id = update_teams(teams, team_id)
-
-            # Droping unnecessary columns
-            results = results.drop(
-                [
-                    "BroadcastName",
-                    "Abbreviation",
-                    "TeamColor",
-                    "DriverId",
-                    "FirstName",
-                    "LastName",
-                    "HeadshotUrl",
-                    "TeamId",
-                ],
-                axis=1,
-            )
-            laps = laps.drop(
-                [
-                    "Sector1SessionTime",
-                    "Sector2SessionTime",
-                    "Sector3SessionTime"
-                ],
-                axis=1,
-            )
 
             # Add EventID (reference key)  to session data
             results["EventID"] = row["EventID"]
